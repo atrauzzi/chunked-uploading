@@ -2,36 +2,37 @@
 
 var ChunkedUploading = function () {
 
-	/**
-	 *
-	 * @type {string}
-	 */
-	var target = "/receive-chunks";
-
 	//
 	// Private
 	//
 
 	/**
 	 *
-	 * @param file {string}
+	 * @type {string}
+	 */
+	var target = "/receive-chunks";
+
+	/**
+	 *
+	 * @param files {string}
 	 * @returns {jQuery.Deferred}
 	 */
-	function doFlowJs(file) {
+	function doFlowJs(files) {
 
 		var deferred = new $.Deferred();
 
-		var flow =
-			new Flow({
+		var flow = new Flow({
 				target: target
 			})
-			.on("complete", function (one, two, three) {
-				console.log(one, two, three);
-				allUploadsComplete(deferred);
-			})
-			//.on("fileSuccess")
-			//.on("")
 		;
+
+		flow.on("complete", function (one, two, three) {
+			console.log(one, two, three);
+			allUploadsComplete(deferred);
+		});
+
+		console.log(flow);
+
 		//.fileSuccess(file, message, chunk) A specific file was completed. First argument file is instance of FlowFile, second argument message contains server response. Response is always a string. Third argument chunk is instance of FlowChunk. You can get response status by accessing xhr object chunk.xhr.status.
 		//.fileProgress(file, chunk) Uploading progressed for a specific file.
 		//.fileAdded(file, event) This event is used for file validation. To reject this file return false. This event is also called before file is added to upload queue, this means that calling flow.upload() function will not start current file upload. Optionally, you can use the browser event object from when the file was added.
@@ -45,7 +46,10 @@ var ChunkedUploading = function () {
 		//.error(message, file, chunk) An error, including fileError, occurred.
 		//.catchAll(event, ...) Listen to all the events listed above with the same callback function.
 
-		flow.addFile(file);
+		$.each(files, function (index, file) {
+			flow.addFile(file);
+		});
+
 		flow.upload();
 
 		return deferred;
@@ -53,9 +57,13 @@ var ChunkedUploading = function () {
 	}
 
 	//
-	// Wrappers for library events.
+	// Common abstractions all libaries should defer to.
 
-	function allUploadsComplete() {
+	/**
+	 *
+	 * @param deferred {jQuery.Deferred}
+	 */
+	function allUploadsComplete(deferred) {
 
 	}
 
@@ -74,7 +82,7 @@ var ChunkedUploading = function () {
 	 */
 	this.upload = function (files, library) {
 
-		console.log("Submitting \"" + files.name + "\" using " + library);
+		console.log("Submitting \"" + files + "\" using " + library);
 
 		switch(library) {
 
@@ -82,7 +90,7 @@ var ChunkedUploading = function () {
 				return doFlowJs(files);
 			break;
 
-			// Return a failed deferred.
+			// Return a failed deferred if somehow an invalid library was chosen?!
 			default:
 				var failure = $.Deferred();
 				failure.reject();

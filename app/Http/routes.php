@@ -13,6 +13,7 @@
 
 /** @var $router \Illuminate\Routing\Router */
 
-$router->get('/', 'WelcomeController@index');
+$router->get('', 'WelcomeController@index');
 
-$router->post('/receive-chunks', ['as' => 'chunk', 'WelcomeController@receiveChunks']);
+$router->post('receive-chunks', ['as' => 'chunk', 'WelcomeController@receiveChunks']);
+$router->get('receive-chunks', ['as' => 'chunk-check', 'WelcomeController@receiveChunks']);
