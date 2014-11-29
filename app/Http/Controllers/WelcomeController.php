@@ -1,25 +1,22 @@
 <?php namespace App\Http\Controllers;
 
-class WelcomeController extends Controller {
+use Illuminate\Http\Request;
 
-	/**
-	 * Create a new controller instance.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-		$this->middleware('guest');
-	}
+class WelcomeController extends Controller {
 
 	/**
 	 * Show the application welcome screen to the user.
 	 *
 	 * @return Response
 	 */
-	public function index()
-	{
+	public function index() {
 		return view('welcome');
+	}
+
+	public function receiveChunks(Request $request) {
+
+		var_dump($request);
+
 	}
 
 }

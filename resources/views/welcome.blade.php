@@ -2,59 +2,91 @@
 
 @section('content')
 <div id="welcome">
+
     <div class="jumbotron">
         <div class="container">
             <h1 class="jumbotron__header">You have arrived.</h1>
 
             <p class="jumbotron__body">
-                Laravel is a web application framework with expressive, elegant syntax. We believe development
-                must be an enjoyable, creative experience. Enjoy the fresh air.
+                This chunking demo serves to illustrate the confusing specifics of how chunked uploads from a client are handled server-side as well as how client libraries can differ in implementation.
             </p>
         </div>
     </div>
 
     <div class="container">
-        <ol class="steps">
-            <li class="steps__item">
-                <div class="body">
-                    <h2>Go Exploring</h2>
 
-                    <p>
-                        Review <code>app/Http/routes.php</code> to learn how HTTP requests are
-                        routed to controllers.
-                    </p>
+    	<form
+    		id="chunk"
+    		name="chunk"
+    		action="{{ url("chunk") }}"
+    		method="POST"
+		>
 
-                    <p>
-                        We've included simple login and registration screens to get you started.
-                    </p>
-                </div>
-            </li>
+			<fieldset>
 
-            <li class="steps__item">
-                <div class="body">
-                    <h2>Master Your Craft</h2>
+				<legend>First choose a library to use</legend>
 
-                    <p>
-                        Ready to keep learning more about Laravel? Start here:
-                    </p>
+				<dl>
 
-                    <ul>
-                        <li><a href="http://laravel.com/docs">Laravel Documentation</a></li>
-                        <li><a href="https://laracasts.com">Laravel 5 From Scratch (via Laracasts)</a></li>
-                    </ul>
-                </div>
-            </li>
+					<dt><input type="radio" name="library" id="library-flow-js" value="flow.js" checked /></dt>
+					<dd><label for="library-flow-js"><a href="http://github.com/flowjs/flow.js">flow.js</a></label></dd>
 
-            <li class="steps__item">
-                <div class="body">
-                    <h2>Forge Ahead</h2>
+					<!--
+					<dt><input type="radio" name="library" id="library-flow-js" value="flow.js" /></dt>
+					<dd><label for="library-flow-js"><a href="http://github.com/flowjs/flow.js">flow.js</a></label></dd>
+					-->
 
-                    <p>
-                        When you're finished building your application, Laravel still has your back. Check out <a href="https://forge.laravel.com">Laravel Forge</a>.
-                    </p>
-                </div>
-            </li>
-        </ol>
+				</dl>
+
+			</fieldset>
+
+			<fieldset>
+
+				<legend>Then choose one or more files</legend>
+
+    			<input type="file" multiple />
+
+    			<p>File upload will commence upon selection of a file.</p>
+
+			</fieldset>
+
+
+			<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+
+    	</form>
+
     </div>
+
 </div>
+@stop
+
+@section('scripts')
+
+		<script type="text/javascript" src="/vendor/flow.js/dist/flow.js"></script>
+		<script type="text/javascript" src="/js/flow.js"></script>
+
+		<script type="text/javascript" src="/js/ChunkedUploading.js"></script>
+
+    	<script type="text/javascript">
+
+			"use strict";
+
+			$(document).ready(function () {
+
+				var fileInput = $("input[type=file]").get(0);
+				var chunkedUploading = new ChunkedUploading();
+
+				$(fileInput).on('change', function (event) {
+
+					var uploads = chunkedUploading.upload(
+						fileInput.files,
+						$("input[name=library]").val()
+					);
+
+				});
+
+			});
+
+    	</script>
+
 @stop
