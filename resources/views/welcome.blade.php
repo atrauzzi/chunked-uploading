@@ -74,7 +74,9 @@
 			$(document).ready(function () {
 
 				var fileInput = $("input[type=file]").get(0);
-				var chunkedUploading = new ChunkedUploading();
+				var chunkedUploading = new ChunkedUploading({
+					csrf: $("input[type=hidden]").val()
+				});
 
 				$(fileInput).on('change', function (event) {
 

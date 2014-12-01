@@ -1,18 +1,34 @@
 "use strict";
 
-var ChunkedUploading = function () {
+var ChunkedUploading = function (options) {
+
+	options = options || {};
 
 	//
 	// Private
 	//
 
 	/**
+	 * Server endpoint to hit.
 	 *
 	 * @type {string}
 	 */
-	var target = "/receive-chunks";
+	var endpoint = options.endpoint || "/chunk";
 
 	/**
+	 * The next csrf that should be used (probably never changes after being set).
+	 */
+	var csrf = options.csrf;
+
+	/**
+	 * In the case of Laravel, the token comes in on the "_token" attribute, but it's configurable.
+	 *
+	 * @type {*|string}
+	 */
+	var csrfAttribute = options.csrfAttribute || "_token";
+
+	/**
+	 *	Do a chunked upload using flow.js
 	 *
 	 * @param files {string}
 	 * @returns {jQuery.Deferred}
@@ -21,13 +37,18 @@ var ChunkedUploading = function () {
 
 		var deferred = new $.Deferred();
 
-		var flow = new Flow({
-				target: target
-			})
-		;
+		var options = {
+			target: endpoint,
+			query: {
+			}
+		};
+
+		if(csrf)
+			options.query[csrfAttribute] = csrf;
+
+		var flow = new Flow(options);
 
 		flow.on("complete", function (one, two, three) {
-			console.log(one, two, three);
 			allUploadsComplete(deferred);
 		});
 
@@ -64,7 +85,7 @@ var ChunkedUploading = function () {
 	 * @param deferred {jQuery.Deferred}
 	 */
 	function allUploadsComplete(deferred) {
-
+		console.log("All uploads finished.");
 	}
 
 
@@ -82,7 +103,7 @@ var ChunkedUploading = function () {
 	 */
 	this.upload = function (files, library) {
 
-		console.log("Submitting \"" + files + "\" using " + library);
+		console.log("Submitting",  files, "using " + library);
 
 		switch(library) {
 
